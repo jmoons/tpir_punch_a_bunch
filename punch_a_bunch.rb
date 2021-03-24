@@ -22,8 +22,8 @@ class PunchABunch
   NUMBER_OF_ROWS      = 5
   NUMBER_OF_COLUMNS   = 10
   NUMBER_OF_PUNCHES   = 4
-  CONTINUE_STRING     = "C"
-  KEEP_STRING         = "K"
+  CONTINUE_STRING     = "c"
+  KEEP_STRING         = "k"
   MATCH_EXPRESSION    = /(\d+),\s*(\d+)/
   MATCH_ROW_OFFSET    = 1
   MATCH_COLUMN_OFFSET = 2
@@ -74,7 +74,7 @@ class PunchABunch
   def get_user_continue
     puts "Keep current amount or Continue to Play? (#{KEEP_STRING} or #{CONTINUE_STRING}): "
     user_input = gets
-    user_input = user_input.chomp.upcase
+    user_input = user_input.chomp.downcase
 
     get_user_continue unless ( user_input == KEEP_STRING || user_input == CONTINUE_STRING)
 
