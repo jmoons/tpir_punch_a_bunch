@@ -19,11 +19,14 @@ class PunchABunch
     [50]   * 10
   ]
 
-  NUMBER_OF_ROWS    = 5
-  NUMBER_OF_COLUMNS = 10
-  NUMBER_OF_PUNCHES = 4
-  CONTINUE_STRING   = "C"
-  KEEP_STRING       = "K"
+  NUMBER_OF_ROWS      = 5
+  NUMBER_OF_COLUMNS   = 10
+  NUMBER_OF_PUNCHES   = 4
+  CONTINUE_STRING     = "C"
+  KEEP_STRING         = "K"
+  MATCH_EXPRESSION    = /(\d+),\s*(\d+)/
+  MATCH_ROW_OFFSET    = 1
+  MATCH_COLUMN_OFFSET = 2
 
   def initialize
     @prize_board    = build_game_prizes
@@ -55,11 +58,13 @@ class PunchABunch
   def get_user_punches
     #return array of four punch values
     user_punches = []
-    NUMBER_OF_PUNCHES.times do | punch_number |
-      user_row    = get_user_row
-      user_column = get_user_column
 
-      user_punches << @prize_board[ user_row - 1 ][ user_column - 1]
+    while ( user_punches.length < NUMBER_OF_PUNCHES )
+      user_punch_match_data = get_user_punch
+
+      if validate_punch( user_punch_match_data )
+        user_punches << @prize_board[ user_punch_match_data[MATCH_ROW_OFFSET].to_i - 1 ][ user_punch_match_data[MATCH_COLUMN_OFFSET].to_i - 1]
+      end
 
     end
 
@@ -76,22 +81,24 @@ class PunchABunch
     user_input
   end
 
-  def get_user_row
-    puts "Punch which Row, 1 - #{NUMBER_OF_ROWS}?: "
-    user_input = gets
-    user_input = user_input.to_i
+  def validate_punch(punch_match_data)
+    valid_punch = !(punch_match_data.nil?)
 
-    get_user_row unless (1..NUMBER_OF_ROWS).include?(user_input)
+    valid_punch = valid_punch && punch_match_data.captures.length == 2
 
-    user_input
+    valid_punch = valid_punch &&  ( punch_match_data[MATCH_ROW_OFFSET].to_i > 0 &&
+                                    punch_match_data[MATCH_ROW_OFFSET].to_i <= NUMBER_OF_ROWS &&
+                                    punch_match_data[MATCH_COLUMN_OFFSET].to_i > 0 &&
+                                    punch_match_data[MATCH_COLUMN_OFFSET].to_i <= NUMBER_OF_COLUMNS
+                                  )
+
+    valid_punch
   end
 
-  def get_user_column
-    puts "Punch which column, 1 - #{NUMBER_OF_COLUMNS}?: "
-    user_input = gets
-    user_input = user_input.to_i
-
-    get_user_column unless (1..NUMBER_OF_COLUMNS).include?(user_input)
+  def get_user_punch
+    puts "Where do you want to punch (Row (1-5), Column (1-10))?: "
+    user_input          = gets
+    user_input          = user_input.chomp.match( MATCH_EXPRESSION )
 
     user_input
   end
