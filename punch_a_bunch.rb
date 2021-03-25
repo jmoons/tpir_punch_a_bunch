@@ -29,8 +29,8 @@ class PunchABunch
   MATCH_COLUMN_OFFSET = 2
 
   def initialize
-    @prize_board    = build_game_prizes
-    @users_punches  = get_user_punches
+    @prize_board              = build_game_prizes
+    @user_punches_with_offset = get_user_punches
 
     determine_won_amount
   end
@@ -38,10 +38,10 @@ class PunchABunch
   private
 
   def determine_won_amount
-    current_amount = @users_punches.shift
+    current_amount = get_punch_value( @user_punches_with_offset.shift )
     puts "Current Amount: #{current_amount}"
 
-    if @users_punches.length == 0
+    if @user_punches_with_offset.length == 0
       end_game(current_amount)
     else
       user_input = get_user_continue
@@ -52,7 +52,19 @@ class PunchABunch
 
   def end_game(current_amount)
     puts "You Won: #{current_amount}"
-    puts "Reamining Amounts: #{@users_punches.inspect}"
+    puts "Reamining Amounts: #{get_remaining_amounts}"
+  end
+
+  def get_remaining_amounts
+    remaining_amounts = []
+    @user_punches_with_offset.each do |remaining_punch|
+      remaining_amounts << get_punch_value(remaining_punch)
+    end
+    remaining_amounts
+  end
+
+  def get_punch_value(punch_location)
+    @prize_board[punch_location[0]][punch_location[1]]
   end
 
   def get_user_punches
@@ -63,7 +75,7 @@ class PunchABunch
       user_punch_match_data = get_user_punch
 
       if validate_punch( user_punch_match_data )
-        user_punches << @prize_board[ user_punch_match_data[MATCH_ROW_OFFSET].to_i - 1 ][ user_punch_match_data[MATCH_COLUMN_OFFSET].to_i - 1]
+        user_punches << [ user_punch_match_data[MATCH_ROW_OFFSET].to_i - 1, user_punch_match_data[MATCH_COLUMN_OFFSET].to_i - 1 ]
       end
 
     end
