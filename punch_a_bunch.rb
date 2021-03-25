@@ -74,7 +74,7 @@ class PunchABunch
     while ( user_punches.length < NUMBER_OF_PUNCHES )
       user_punch_match_data = get_user_punch
 
-      if validate_punch( user_punch_match_data )
+      if validate_punch( user_punch_match_data, user_punches )
         user_punches << [ user_punch_match_data[MATCH_ROW_OFFSET].to_i - 1, user_punch_match_data[MATCH_COLUMN_OFFSET].to_i - 1 ]
       end
 
@@ -93,7 +93,7 @@ class PunchABunch
     user_input
   end
 
-  def validate_punch(punch_match_data)
+  def validate_punch(punch_match_data, existing_punches)
     valid_punch = !(punch_match_data.nil?)
 
     valid_punch = valid_punch && punch_match_data.captures.length == 2
@@ -103,6 +103,8 @@ class PunchABunch
                                     punch_match_data[MATCH_COLUMN_OFFSET].to_i > 0 &&
                                     punch_match_data[MATCH_COLUMN_OFFSET].to_i <= NUMBER_OF_COLUMNS
                                   )
+
+    valid_punch = valid_punch && !( existing_punches.include?([ punch_match_data[MATCH_ROW_OFFSET].to_i - 1, punch_match_data[MATCH_COLUMN_OFFSET].to_i - 1 ]) )
 
     valid_punch
   end
